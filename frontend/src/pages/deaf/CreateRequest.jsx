@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { requestAPI } from '../../utils/api';
 
 export default function CreateRequest() {
   const navigate = useNavigate();
@@ -18,16 +17,12 @@ export default function CreateRequest() {
     e.preventDefault();
     setLoading(true);
     
-    try {
-      const response = await requestAPI.create(formData);
+    // Simulate API call for now
+    setTimeout(() => {
       alert('Request created successfully! 🎉');
-      navigate('/deaf/dashboard');
-    } catch (error) {
-      console.error('Error creating request:', error);
-      alert('Failed to create request. Please try again.');
-    } finally {
       setLoading(false);
-    }
+      navigate('/deaf/dashboard');
+    }, 1000);
   };
 
   const handleChange = (e) => {

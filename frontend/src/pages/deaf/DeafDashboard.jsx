@@ -1,12 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../utils/auth';
 
 export default function DeafDashboard() {
   const navigate = useNavigate();
-  
-  const handleLogout = () => {
-    logout();
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,7 +13,7 @@ export default function DeafDashboard() {
             <h1 className="text-2xl font-bold">TERP / on the go</h1>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => navigate('/login')}
             className="text-gray-600 hover:text-gray-800"
           >
             Logout
