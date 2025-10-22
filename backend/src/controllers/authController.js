@@ -2,102 +2,225 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../models/database');
 
-// Register user
-const register = async (req, res) => {
-  try {
-    const { email, password, userType, firstName, lastName } = req.body;
+// Generate JWT token
+const generateToken = (userId, userType) => {
+  return jwt.sign(
+    { id: userId, user_type: userType },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+  );
+};
 
-    // Check if user already exists
-    const existingUser = await pool.query(
+// Register Deaf User
+exports.registerDeaf = async (req, res) => {
+  try {
+    const { email, password, name, phone } = req.body;
+
+    // Check if user exists
+    const userExists = await pool.query(
       'SELECT * FROM users WHERE email = $1',
       [email]
     );
 
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'User already exists' });
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email already registered' 
+      });
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
 
-    // Create user
-    const newUser = await pool.query(
-      'INSERT INTO users (email, password, user_type, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, user_type, first_name, last_name',
-      [email, hashedPassword, userType, firstName, lastName]
+    // Insert user
+    const result = await pool.query(
+      `INSERT INTO users (user_type, email, password_hash, name, phone) 
+       VALUES ($1, $2, $3, $4, $5) 
+       RETURNING id, user_type, email, name, phone, created_at`,
+      ['deaf', email, password_hash, name, phone]
     );
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: newUser.rows[0].id, email: newUser.rows[0].email },
-      process.env.JWT_SECRET || 'fallback_secret',
-      { expiresIn: '24h' }
-    );
+    const user = result.rows[0];
+    const token = generateToken(user.id, user.user_type);
 
     res.status(201).json({
-      message: 'User created successfully',
+      success: true,
+      message: 'Deaf user registered successfully',
       token,
-      user: newUser.rows[0]
+      user: {
+        id: user.id,
+        user_type: user.user_type,
+        email: user.email,
+        name: user.name,
+        phone: user.phone
+      }
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Register deaf error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during registration' 
+    });
   }
 };
 
-// Login user
-const login = async (req, res) => {
+// Register Interpreter
+exports.registerInterpreter = async (req, res) => {
+  try {
+    const { email, password, name, phone, hourly_rate } = req.body;
+
+    // Check if user exists
+    const userExists = await pool.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email already registered' 
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // Insert user
+    const result = await pool.query(
+      `INSERT INTO users (user_type, email, password_hash, name, phone, hourly_rate) 
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING id, user_type, email, name, phone, hourly_rate, created_at`,
+      ['interpreter', email, password_hash, name, phone, hourly_rate || 75]
+    );
+
+    const user = result.rows[0];
+    const token = generateToken(user.id, user.user_type);
+
+    res.status(201).json({
+      success: true,
+      message: 'Interpreter registered successfully',
+      token,
+      user: {
+        id: user.id,
+        user_type: user.user_type,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        hourly_rate: user.hourly_rate
+      }
+    });
+  } catch (error) {
+    console.error('Register interpreter error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during registration' 
+    });
+  }
+};
+
+// Login Deaf User
+exports.loginDeaf = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Find user
-    const user = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
-      [email]
+    const result = await pool.query(
+      'SELECT * FROM users WHERE email = $1 AND user_type = $2',
+      [email, 'deaf']
     );
 
-    if (user.rows.length === 0) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    if (result.rows.length === 0) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid email or password' 
+      });
     }
+
+    const user = result.rows[0];
 
     // Check password
-    const isValidPassword = await bcrypt.compare(password, user.rows[0].password);
-
-    if (!isValidPassword) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid email or password' 
+      });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.rows[0].id, email: user.rows[0].email },
-      process.env.JWT_SECRET || 'fallback_secret',
-      { expiresIn: '24h' }
-    );
+    const token = generateToken(user.id, user.user_type);
 
-    res.status(200).json({
+    res.json({
+      success: true,
       message: 'Login successful',
       token,
       user: {
-        id: user.rows[0].id,
-        email: user.rows[0].email,
-        userType: user.rows[0].user_type,
-        firstName: user.rows[0].first_name,
-        lastName: user.rows[0].last_name
+        id: user.id,
+        user_type: user.user_type,
+        email: user.email,
+        name: user.name,
+        phone: user.phone
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Login deaf error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during login' 
+    });
   }
 };
 
-// Logout user
-const logout = async (req, res) => {
-  // Since we're using JWT, logout is handled on the client side
-  res.status(200).json({ message: 'Logout successful' });
-};
+// Login Interpreter
+exports.loginInterpreter = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-module.exports = {
-  register,
-  login,
-  logout
+    // Find user
+    const result = await pool.query(
+      'SELECT * FROM users WHERE email = $1 AND user_type = $2',
+      [email, 'interpreter']
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid email or password' 
+      });
+    }
+
+    const user = result.rows[0];
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid email or password' 
+      });
+    }
+
+    const token = generateToken(user.id, user.user_type);
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        user_type: user.user_type,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        hourly_rate: user.hourly_rate
+      }
+    });
+  } catch (error) {
+    console.error('Login interpreter error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during login' 
+    });
+  }
 };
