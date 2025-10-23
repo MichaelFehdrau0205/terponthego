@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
 
-// Generate JWT token
 const generateToken = (userId, userType) => {
   return jwt.sign(
     { userId, userType },
@@ -11,12 +10,10 @@ const generateToken = (userId, userType) => {
   );
 };
 
-// Signup
 exports.signup = async (req, res) => {
   try {
-    const { userType, name, email, password, phone, certification } = req.body;
+    const { userType, name, email, password, certification } = req.body;
 
-    // Validate required fields
     if (!userType || !name || !email || !password) {
       return res.status(400).json({ 
         success: false, 
@@ -24,22 +21,18 @@ exports.signup = async (req, res) => {
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
     let result;
     
     if (userType === 'deaf') {
-      // Insert into deaf_users table
       result = await pool.query(
-        'INSERT INTO deaf_users (name, email, password, phone) VALUES ($1, $2, $3, $4) RETURNING id, name, email',
-        [name, email, hashedPassword, phone]
+        'INSERT INTO deaf_users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email',
+        [name, email, hashedPassword]
       );
     } else if (userType === 'interpreter') {
-      // Insert into interpreters table
       result = await pool.query(
-        'INSERT INTO interpreters (name, email, password, phone, certification) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email',
-        [name, email, hashedPassword, phone, certification]
+        'INSERT INTO interpreters (name, email, password, certification) VALUES ($1, $2, $3, $4) RETURNING id, name, email',
+        [name, email, hashedPassword, certification]
       );
     } else {
       return res.status(400).json({ 
@@ -66,7 +59,7 @@ exports.signup = async (req, res) => {
   } catch (error) {
     console.error('Signup error:', error);
     
-    if (error.code === '23505') { // Unique violation
+    if (error.code === '23505') {
       return res.status(400).json({ 
         success: false, 
         message: 'Email already exists' 
@@ -80,44 +73,55 @@ exports.signup = async (req, res) => {
   }
 };
 
-// Login
 exports.login = async (req, res) => {
   try {
-    const { userType, email, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!userType || !email || !password) {
+    if (!email || !password) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Please provide all required fields' 
+        message: 'Please provide email and password' 
       });
     }
 
-    let result;
-    const tableName = userType === 'deaf' ? 'deaf_users' : 'interpreters';
+    console.log('🔍 Checking login for:', email);
 
-    result = await pool.query(
-      `SELECT * FROM ${tableName} WHERE email = $1`,
-      [email]
-    );
+    let user = null;
+    let userType = null;
+    let result = await pool.query('SELECT * FROM deaf_users WHERE email = $1', [email]);
 
-    if (result.rows.length === 0) {
+    if (result.rows.length > 0) {
+      user = result.rows[0];
+      userType = 'deaf';
+      console.log('✅ Found in deaf_users table');
+    } else {
+      result = await pool.query('SELECT * FROM interpreters WHERE email = $1', [email]);
+      if (result.rows.length > 0) {
+        user = result.rows[0];
+        userType = 'interpreter';
+        console.log('✅ Found in interpreters table');
+      }
+    }
+
+    if (!user) {
+      console.log('❌ User not found');
       return res.status(401).json({ 
         success: false, 
-        message: 'Invalid credentials' 
+        message: 'Invalid email or password' 
       });
     }
 
-    const user = result.rows[0];
-
-    // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      console.log('❌ Invalid password');
       return res.status(401).json({ 
         success: false, 
-        message: 'Invalid credentials' 
+        message: 'Invalid email or password' 
       });
     }
+
+    console.log('✅ Login successful for:', userType);
 
     const token = generateToken(user.id, userType);
 
