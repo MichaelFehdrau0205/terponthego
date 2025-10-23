@@ -10,11 +10,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 // Add logging middleware
 app.use((req, res, next) => {
   console.log(`📨 ${req.method} ${req.path}`);
   next();
 });
+
+// Import routes
+const authRoutes = require('./routes/auth');
+
+// Use routes
+app.use('/api/auth', authRoutes);
 
 // Test route
 app.get('/', (req, res) => {

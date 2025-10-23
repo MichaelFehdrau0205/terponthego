@@ -2,12 +2,10 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
-// Registration routes
-router.post('/register/deaf', authController.registerDeaf);
-router.post('/register/interpreter', authController.registerInterpreter);
+// Signup route (handles both deaf and interpreter)
+router.post('/signup', authController.signup);
 
-// Login routes
-router.post('/login/deaf', authController.loginDeaf);
-router.post('/login/interpreter', authController.loginInterpreter);
+// Login route (handles both deaf and interpreter)
+router.post('/login', authController.login);
 
 module.exports = router;
