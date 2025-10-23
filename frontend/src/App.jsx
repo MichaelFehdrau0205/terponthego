@@ -1,33 +1,86 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import SplashScreen from './components/SplashScreen';
-import LoginPage from './components/LoginPage';
-import DeafLogin from './pages/auth/DeafLogin';
-import DeafSignup from './pages/auth/DeafSignup';
-import InterpreterLogin from './pages/auth/InterpreterLogin';
-import InterpreterSignup from './pages/auth/InterpreterSignup';
-import DeafDashboard from './pages/deaf/DeafDashboard';
-import CreateRequest from './pages/deaf/CreateRequest';
-import InterpreterDashboard from './pages/interpreter/InterpreterDashboard';
-import ViewRequests from './pages/interpreter/ViewRequests';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import DeafSignupForm from './components/DeafSignupForm';
+import InterpreterSignupForm from './components/InterpreterSignupForm';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<SplashScreen />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/auth/deaf/login" element={<DeafLogin />} />
-        <Route path="/auth/deaf/signup" element={<DeafSignup />} />
-        <Route path="/auth/interpreter/login" element={<InterpreterLogin />} />
-        <Route path="/auth/interpreter/signup" element={<InterpreterSignup />} />
-        
-        {/* Temporarily without auth - we'll add it back later */}
-        <Route path="/deaf/dashboard" element={<DeafDashboard />} />
-        <Route path="/deaf/request" element={<CreateRequest />} />
-        <Route path="/interpreter/dashboard" element={<InterpreterDashboard />} />
-        <Route path="/interpreter/requests" element={<ViewRequests />} />
-      </Routes>
+      <div>
+        <Routes>
+          {/* Home/Landing Page */}
+          <Route path="/" element={<HomePage />} />
+          
+          {/* Signup Routes */}
+          <Route path="/signup/deaf" element={<DeafSignupForm />} />
+          <Route path="/signup/interpreter" element={<InterpreterSignupForm />} />
+          
+          {/* Temporary dashboard routes - we'll build these next */}
+          <Route path="/deaf-dashboard" element={<TempDashboard userType="deaf" />} />
+          <Route path="/interpreter-dashboard" element={<TempDashboard userType="interpreter" />} />
+        </Routes>
+      </div>
     </Router>
+  );
+}
+
+// Simple home page component
+function HomePage() {
+  return (
+    <div style={{ textAlign: 'center', marginTop: '100px' }}>
+      <h1>🤟 TERP on the Go</h1>
+      <p>Connect with ASL Interpreters instantly</p>
+      
+      <div style={{ marginTop: '40px' }}>
+        <h3>Sign Up As:</h3>
+        <Link to="/signup/deaf">
+          <button style={{
+            padding: '15px 30px',
+            margin: '10px',
+            fontSize: '16px',
+            backgroundColor: '#2196F3',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Deaf User
+          </button>
+        </Link>
+        
+        <Link to="/signup/interpreter">
+          <button style={{
+            padding: '15px 30px',
+            margin: '10px',
+            fontSize: '16px',
+            backgroundColor: '#f44336',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Interpreter
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// Temporary dashboard (we'll build real ones later)
+function TempDashboard({ userType }) {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  return (
+    <div style={{ textAlign: 'center', marginTop: '100px' }}>
+      <h1>✅ Signup Successful!</h1>
+      <h2>Welcome, {userType === 'deaf' ? 'Deaf User' : 'Interpreter'}!</h2>
+      <p>Dashboard coming soon...</p>
+      <Link to="/">
+        <button style={{ padding: '10px 20px', marginTop: '20px' }}>
+          Back to Home
+        </button>
+      </Link>
+    </div>
   );
 }
 
