@@ -5,7 +5,6 @@ function InterpreterSignupForm() {
     name: '',
     email: '',
     password: '',
-    phone: '',
     certification: ''
   });
   const [error, setError] = useState('');
@@ -108,17 +107,6 @@ function InterpreterSignupForm() {
             onChange={handleChange}
             required
             minLength="6"
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </div>
-
-        <div style={{ marginBottom: '15px' }}>
-          <label>Phone:</label>
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
             style={{ width: '100%', padding: '8px', marginTop: '5px' }}
           />
         </div>

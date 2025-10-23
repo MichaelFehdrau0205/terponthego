@@ -1,20 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DeafSignupForm from './components/DeafSignupForm';
 import InterpreterSignupForm from './components/InterpreterSignupForm';
+import LoginForm from './components/LoginForm';
 
 function App() {
   return (
     <Router>
       <div>
         <Routes>
-          {/* Home/Landing Page */}
           <Route path="/" element={<HomePage />} />
-          
-          {/* Signup Routes */}
           <Route path="/signup/deaf" element={<DeafSignupForm />} />
           <Route path="/signup/interpreter" element={<InterpreterSignupForm />} />
-          
-          {/* Temporary dashboard routes - we'll build these next */}
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/deaf-dashboard" element={<TempDashboard userType="deaf" />} />
           <Route path="/interpreter-dashboard" element={<TempDashboard userType="interpreter" />} />
         </Routes>
@@ -23,7 +20,6 @@ function App() {
   );
 }
 
-// Simple home page component
 function HomePage() {
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
@@ -62,22 +58,40 @@ function HomePage() {
           </button>
         </Link>
       </div>
+
+      <div style={{ marginTop: '40px' }}>
+        <p>Already have an account?</p>
+        <Link to="/login">
+          <button style={{
+            padding: '10px 30px',
+            fontSize: '16px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Login
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
 
-// Temporary dashboard (we'll build real ones later)
 function TempDashboard({ userType }) {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : {};
   
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
-      <h1>✅ Signup Successful!</h1>
-      <h2>Welcome, {userType === 'deaf' ? 'Deaf User' : 'Interpreter'}!</h2>
+      <h1>✅ Welcome Back!</h1>
+      <h2>Hello, {user.name || 'User'}!</h2>
+      <p>You're logged in as: {userType === 'deaf' ? 'Deaf User' : 'Interpreter'}</p>
       <p>Dashboard coming soon...</p>
       <Link to="/">
         <button style={{ padding: '10px 20px', marginTop: '20px' }}>
-          Back to Home
+          Logout / Back to Home
         </button>
       </Link>
     </div>

@@ -1,11 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function DeafSignupForm() {
+function LoginForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
-    password: '',
-    phone: '' // DELETE THIS LINE
+    password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,35 +22,37 @@ function DeafSignupForm() {
     setError('');
     setLoading(true);
 
-    console.log('🔄 Submitting deaf signup:', formData);
+    console.log('🔄 Submitting login:', formData);
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/signup', {
+      const response = await fetch('http://localhost:3001/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userType: 'deaf',
-          ...formData
-        }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
-      console.log('✅ Signup response:', data);
+      console.log('✅ Login response:', data);
 
       if (data.success) {
-        alert('Signup successful! Welcome!');
-        // Store token
         localStorage.setItem('token', data.token);
-        localStorage.setItem('userType', 'deaf');
-        // Redirect to dashboard (we'll add this later)
-        window.location.href = '/deaf-dashboard';
+        localStorage.setItem('userType', data.user.userType);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        alert(`Login successful! Welcome back, ${data.user.name}!`);
+        
+        if (data.user.userType === 'deaf') {
+          navigate('/deaf-dashboard');
+        } else {
+          navigate('/interpreter-dashboard');
+        }
       } else {
-        setError(data.message || 'Signup failed');
+        setError(data.message || 'Login failed');
       }
     } catch (err) {
-      console.error('❌ Signup error:', err);
+      console.error('❌ Login error:', err);
       setError('Could not connect to server. Please try again.');
     } finally {
       setLoading(false);
@@ -59,7 +61,10 @@ function DeafSignupForm() {
 
   return (
     <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h2>Deaf User Signup</h2>
+      <h2>🤟 Login to TERP</h2>
+      <p style={{ color: '#666', marginBottom: '20px' }}>
+        Enter your credentials
+      </p>
       
       {error && (
         <div style={{ 
@@ -75,18 +80,6 @@ function DeafSignupForm() {
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </div>
-
-        <div style={{ marginBottom: '15px' }}>
           <label>Email:</label>
           <input
             type="email"
@@ -94,6 +87,7 @@ function DeafSignupForm() {
             value={formData.email}
             onChange={handleChange}
             required
+            placeholder="your.email@example.com"
             style={{ width: '100%', padding: '8px', marginTop: '5px' }}
           />
         </div>
@@ -106,7 +100,7 @@ function DeafSignupForm() {
             value={formData.password}
             onChange={handleChange}
             required
-            minLength="6"
+            placeholder="Enter your password"
             style={{ width: '100%', padding: '8px', marginTop: '5px' }}
           />
         </div>
@@ -117,22 +111,23 @@ function DeafSignupForm() {
           style={{ 
             width: '100%', 
             padding: '10px', 
-            backgroundColor: '#2196F3',
+            backgroundColor: '#4CAF50',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer'
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '16px'
           }}
         >
-          {loading ? 'Signing up...' : 'Sign Up'}
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
       <p style={{ marginTop: '20px', textAlign: 'center' }}>
-        Already have an account? <a href="/login">Login</a>
+        Don't have an account? <a href="/">Sign up</a>
       </p>
     </div>
   );
 }
 
-export default DeafSignupForm;
+export default LoginForm;
