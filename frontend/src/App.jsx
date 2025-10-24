@@ -4,6 +4,8 @@ import InterpreterSignupForm from './components/InterpreterSignupForm';
 import LoginForm from './components/LoginForm';
 import CreateRequestForm from './components/CreateRequestForm';
 import ViewRequestsPage from './components/ViewRequestsPage';
+import MapView from './components/MapView';
+
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
           {/* Deaf Dashboard & Features */}
           <Route path="/deaf-dashboard" element={<DeafDashboard />} />
           <Route path="/create-request" element={<CreateRequestForm />} />
+          <Route path="/map" element={<MapView />} />
           
           {/* Interpreter Dashboard & Features */}
           <Route path="/interpreter-dashboard" element={<InterpreterDashboard />} />
@@ -114,6 +117,23 @@ function DeafDashboard() {
           </button>
         </Link>
         
+        <Link to="/map">
+          <button style={{
+            padding: '15px 30px',
+            margin: '10px',
+            fontSize: '16px',
+            backgroundColor: '#FF9800',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%'
+          }}>
+            🗺️ View Map & Find Interpreters
+          </button>
+        </Link>  
+
         <Link to="/">
           <button style={{
             padding: '10px 20px',
