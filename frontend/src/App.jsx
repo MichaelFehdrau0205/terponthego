@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DeafSignupForm from './components/DeafSignupForm';
 import InterpreterSignupForm from './components/InterpreterSignupForm';
 import LoginForm from './components/LoginForm';
+import CreateRequestForm from './components/CreateRequestForm';
+import ViewRequestsPage from './components/ViewRequestsPage';
 
 function App() {
   return (
@@ -12,8 +14,14 @@ function App() {
           <Route path="/signup/deaf" element={<DeafSignupForm />} />
           <Route path="/signup/interpreter" element={<InterpreterSignupForm />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/deaf-dashboard" element={<TempDashboard userType="deaf" />} />
-          <Route path="/interpreter-dashboard" element={<TempDashboard userType="interpreter" />} />
+          
+          {/* Deaf Dashboard & Features */}
+          <Route path="/deaf-dashboard" element={<DeafDashboard />} />
+          <Route path="/create-request" element={<CreateRequestForm />} />
+          
+          {/* Interpreter Dashboard & Features */}
+          <Route path="/interpreter-dashboard" element={<InterpreterDashboard />} />
+          <Route path="/view-requests" element={<ViewRequestsPage />} />
         </Routes>
       </div>
     </Router>
@@ -79,21 +87,92 @@ function HomePage() {
   );
 }
 
-function TempDashboard({ userType }) {
+function DeafDashboard() {
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : {};
   
   return (
-    <div style={{ textAlign: 'center', marginTop: '100px' }}>
-      <h1>✅ Welcome Back!</h1>
-      <h2>Hello, {user.name || 'User'}!</h2>
-      <p>You're logged in as: {userType === 'deaf' ? 'Deaf User' : 'Interpreter'}</p>
-      <p>Dashboard coming soon...</p>
-      <Link to="/">
-        <button style={{ padding: '10px 20px', marginTop: '20px' }}>
-          Logout / Back to Home
-        </button>
-      </Link>
+    <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
+      <h1>🤟 Deaf User Dashboard</h1>
+      <h2>Welcome, {user.name}!</h2>
+      
+      <div style={{ marginTop: '40px' }}>
+        <Link to="/create-request">
+          <button style={{
+            padding: '15px 30px',
+            margin: '10px',
+            fontSize: '16px',
+            backgroundColor: '#2196F3',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%'
+          }}>
+            📝 Request an Interpreter
+          </button>
+        </Link>
+        
+        <Link to="/">
+          <button style={{
+            padding: '10px 20px',
+            marginTop: '20px',
+            backgroundColor: '#999',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Logout
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function InterpreterDashboard() {
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : {};
+  
+  return (
+    <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
+      <h1>👋 Interpreter Dashboard</h1>
+      <h2>Welcome, {user.name}!</h2>
+      
+      <div style={{ marginTop: '40px' }}>
+        <Link to="/view-requests">
+          <button style={{
+            padding: '15px 30px',
+            margin: '10px',
+            fontSize: '16px',
+            backgroundColor: '#f44336',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%'
+          }}>
+            📋 View Available Requests
+          </button>
+        </Link>
+        
+        <Link to="/">
+          <button style={{
+            padding: '10px 20px',
+            marginTop: '20px',
+            backgroundColor: '#999',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Logout
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
