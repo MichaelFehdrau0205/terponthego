@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -41,17 +42,36 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function MapView() {
+  const [interpreters, setInterpreters] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const deafUserLocation = {
     lat: 42.8864,
     lng: -78.8784,
     name: 'Your Location'
   };
 
-  const interpreters = [
-    { id: 1, name: 'John Smith', lat: 42.9000, lng: -78.8500, available: true },
-    { id: 2, name: 'Sarah Johnson', lat: 42.8700, lng: -78.9000, available: true },
-    { id: 3, name: 'Mike Davis', lat: 42.9100, lng: -78.8600, available: true }
-  ];
+  useEffect(() => {
+    fetchNearbyInterpreters();
+  }, []);
+
+  const fetchNearbyInterpreters = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/requests/nearby-interpreters?latitude=${deafUserLocation.lat}&longitude=${deafUserLocation.lng}&limit=5`
+      );
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Fetched interpreters:', data.interpreters);
+        setInterpreters(data.interpreters);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching interpreters:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRequestInterpreter = (interpreter) => {
     alert(`Requesting ${interpreter.name}...`);
@@ -65,11 +85,19 @@ function MapView() {
     alert(`Starting video call with ${interpreter.name}...`);
   };
 
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '100px' }}>
+        <h2>Loading map...</h2>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '20px' }}>
       <h2>🗺️ Find Nearby Interpreters</h2>
       <p style={{ marginBottom: '20px' }}>
-        🔵 Blue marker = You | 🔴 Red markers = Available Interpreters
+        🔵 Blue marker = You | 🔴 Red markers = Available Interpreters ({interpreters.length} nearby)
       </p>
 
       <MapContainer 
@@ -95,19 +123,22 @@ function MapView() {
           const distance = calculateDistance(
             deafUserLocation.lat,
             deafUserLocation.lng,
-            interpreter.lat,
-            interpreter.lng
+            parseFloat(interpreter.latitude),
+            parseFloat(interpreter.longitude)
           );
 
           return (
             <Marker 
               key={interpreter.id} 
-              position={[interpreter.lat, interpreter.lng]} 
+              position={[parseFloat(interpreter.latitude), parseFloat(interpreter.longitude)]} 
               icon={redIcon}
             >
               <Popup>
                 <div style={{ minWidth: '200px' }}>
                   <h3 style={{ margin: '0 0 10px 0' }}>👋 {interpreter.name}</h3>
+                  <p style={{ margin: '5px 0' }}>
+                    <strong>📜 Certification:</strong> {interpreter.certification || 'N/A'}
+                  </p>
                   <p style={{ margin: '5px 0' }}>
                     <strong>📍 Distance:</strong> {distance} miles away
                   </p>
