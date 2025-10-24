@@ -159,3 +159,34 @@ exports.getMyRequests = async (req, res) => {
     });
   }
 };
+
+// Get nearby interpreters with locations
+exports.getNearbyInterpreters = async (req, res) => {
+  try {
+    const { latitude, longitude, limit = 5 } = req.query;
+
+    // Get available interpreters with locations
+    const result = await pool.query(
+      `SELECT id, name, email, certification, latitude, longitude, available 
+       FROM interpreters 
+       WHERE available = true 
+       AND latitude IS NOT NULL 
+       AND longitude IS NOT NULL 
+       ORDER BY RANDOM() 
+       LIMIT $1`,
+      [limit]
+    );
+
+    res.json({
+      success: true,
+      interpreters: result.rows
+    });
+
+  } catch (error) {
+    console.error('Get nearby interpreters error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching interpreters'
+    });
+  }
+};

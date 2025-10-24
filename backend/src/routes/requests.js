@@ -3,6 +3,9 @@ const router = express.Router();
 const requestController = require('../controllers/requestController');
 const verifyToken = require('../middleware/auth');
 
+// Get nearby interpreters (public - no auth required for viewing map)
+router.get('/nearby-interpreters', requestController.getNearbyInterpreters);
+
 // All routes require authentication
 router.use(verifyToken);
 
