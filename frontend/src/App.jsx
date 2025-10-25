@@ -5,7 +5,7 @@ import LoginForm from './components/LoginForm';
 import CreateRequestForm from './components/CreateRequestForm';
 import ViewRequestsPage from './components/ViewRequestsPage';
 import MapView from './components/MapView';
-
+import TrackingMapView from './components/TrackingMapView';
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
           <Route path="/signup/deaf" element={<DeafSignupForm />} />
           <Route path="/signup/interpreter" element={<InterpreterSignupForm />} />
           <Route path="/login" element={<LoginForm />} />
-          
+          <Route path="/tracking" element={<TrackingMapView />} />
           {/* Deaf Dashboard & Features */}
           <Route path="/deaf-dashboard" element={<DeafDashboard />} />
           <Route path="/create-request" element={<CreateRequestForm />} />
@@ -133,7 +133,22 @@ function DeafDashboard() {
             🗺️ View Map & Find Interpreters
           </button>
         </Link>  
-
+        <Link to="/tracking">
+          <button style={{
+            padding: '15px 30px',
+            margin: '10px',
+            fontSize: '16px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%'
+          }}>
+            🚗 Track Journey to Destination
+          </button>
+        </Link>
         <Link to="/">
           <button style={{
             padding: '10px 20px',
