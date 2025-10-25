@@ -3,10 +3,9 @@ const pool = require('../db');
 // Create a new request (Deaf user)
 exports.createRequest = async (req, res) => {
   try {
-    const { location, date_time, message } = req.body;
-    const { userId, userType } = req.user; // From JWT token
+    const { location, date_time, message, destination_latitude, destination_longitude } = req.body;
+    const { userId, userType } = req.user;
 
-    // Only deaf users can create requests
     if (userType !== 'deaf') {
       return res.status(403).json({
         success: false,
@@ -14,7 +13,6 @@ exports.createRequest = async (req, res) => {
       });
     }
 
-    // Validate required fields
     if (!location || !date_time) {
       return res.status(400).json({
         success: false,
@@ -23,8 +21,8 @@ exports.createRequest = async (req, res) => {
     }
 
     const result = await pool.query(
-      'INSERT INTO requests (deaf_user_id, location, date_time, message, status) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [userId, location, date_time, message || '', 'pending']
+      'INSERT INTO requests (deaf_user_id, location, date_time, message, status, destination_latitude, destination_longitude) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [userId, location, date_time, message || '', 'pending', destination_latitude, destination_longitude]
     );
 
     res.status(201).json({
@@ -47,7 +45,6 @@ exports.getPendingRequests = async (req, res) => {
   try {
     const { userType } = req.user;
 
-    // Only interpreters can view requests
     if (userType !== 'interpreter') {
       return res.status(403).json({
         success: false,
@@ -83,7 +80,6 @@ exports.acceptRequest = async (req, res) => {
     const { requestId } = req.params;
     const { userId, userType } = req.user;
 
-    // Only interpreters can accept requests
     if (userType !== 'interpreter') {
       return res.status(403).json({
         success: false,
@@ -91,7 +87,6 @@ exports.acceptRequest = async (req, res) => {
       });
     }
 
-    // Check if request exists and is pending
     const checkResult = await pool.query(
       'SELECT * FROM requests WHERE id = $1 AND status = $2',
       [requestId, 'pending']
@@ -104,7 +99,6 @@ exports.acceptRequest = async (req, res) => {
       });
     }
 
-    // Update request with interpreter
     const result = await pool.query(
       'UPDATE requests SET interpreter_id = $1, status = $2 WHERE id = $3 RETURNING *',
       [userId, 'accepted', requestId]
@@ -165,7 +159,6 @@ exports.getNearbyInterpreters = async (req, res) => {
   try {
     const { latitude, longitude, limit = 5 } = req.query;
 
-    // Get available interpreters with locations
     const result = await pool.query(
       `SELECT id, name, email, certification, latitude, longitude, available 
        FROM interpreters 

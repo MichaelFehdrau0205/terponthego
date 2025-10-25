@@ -20,10 +20,12 @@ app.use((req, res, next) => {
 // Import routes
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requests');
+const profileRoutes = require('./routes/profile');
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Test route
 app.get('/', (req, res) => {
