@@ -162,18 +162,6 @@ function DeafProfileSetup() {
           </div>
 
           <div style={{ flex: 1 }}>
-            <label>Apt/Suite/Unit (Optional):</label>
-            <input
-              type="text"
-              name="apt_unit"
-              value={formData.apt_unit || ''}
-              onChange={handleChange}
-              placeholder="Apt 2B, Suite 100, etc."
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-            />
-          </div>
-
-          <div style={{ flex: 1 }}>
             <label>State: *</label>
             <select
               name="state"

@@ -8,6 +8,7 @@ import MapView from './components/MapView';
 import TrackingMapView from './components/TrackingMapView';
 import DeafProfileSetup from './components/DeafProfileSetup';
 import InterpreterProfileSetup from './components/InterpreterProfileSetup';
+import DeafDashboard from './components/DeafDashboard';
 
 function App() {
   return (
@@ -97,82 +98,6 @@ function HomePage() {
   );
 }
 
-function DeafDashboard() {
-  const userStr = localStorage.getItem('user');
-  const user = userStr ? JSON.parse(userStr) : {};
-  
-  return (
-    <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
-      <h1>🤟 Deaf User Dashboard</h1>
-      <h2>Welcome, {user.name}!</h2>
-      
-      <div style={{ marginTop: '40px' }}>
-        <Link to="/create-request">
-          <button style={{
-            padding: '15px 30px',
-            margin: '10px',
-            fontSize: '16px',
-            backgroundColor: '#2196F3',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%'
-          }}>
-            📝 Request an Interpreter
-          </button>
-        </Link>
-        
-        <Link to="/map">
-          <button style={{
-            padding: '15px 30px',
-            margin: '10px',
-            fontSize: '16px',
-            backgroundColor: '#FF9800',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%'
-          }}>
-            🗺️ View Map & Find Interpreters
-          </button>
-        </Link>  
-        <Link to="/tracking">
-          <button style={{
-            padding: '15px 30px',
-            margin: '10px',
-            fontSize: '16px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%'
-          }}>
-            🚗 Track Journey to Destination
-          </button>
-        </Link>
-        <Link to="/">
-          <button style={{
-            padding: '10px 20px',
-            marginTop: '20px',
-            backgroundColor: '#999',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}>
-            Logout
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
-}
 
 function InterpreterDashboard() {
   const userStr = localStorage.getItem('user');
