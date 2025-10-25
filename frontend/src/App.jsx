@@ -6,6 +6,8 @@ import CreateRequestForm from './components/CreateRequestForm';
 import ViewRequestsPage from './components/ViewRequestsPage';
 import MapView from './components/MapView';
 import TrackingMapView from './components/TrackingMapView';
+import DeafProfileSetup from './components/DeafProfileSetup';
+import InterpreterProfileSetup from './components/InterpreterProfileSetup';
 
 function App() {
   return (
@@ -13,19 +15,24 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          
+          {/* Signup Routes */}
           <Route path="/signup/deaf" element={<DeafSignupForm />} />
           <Route path="/signup/interpreter" element={<InterpreterSignupForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/tracking" element={<TrackingMapView />} />
-          {/* Deaf Dashboard & Features */}
-          <Route path="/deaf-dashboard" element={<DeafDashboard />} />
-          <Route path="/create-request" element={<CreateRequestForm />} />
-          <Route path="/map" element={<MapView />} />
           
-          {/* Interpreter Dashboard & Features */}
+          {/* Profile Setup Routes - PUT THEM HERE! */}
+          <Route path="/profile-setup/deaf" element={<DeafProfileSetup />} />
+          <Route path="/profile-setup/interpreter" element={<InterpreterProfileSetup />} />
+          
+          {/* Login */}
+          <Route path="/login" element={<LoginForm />} />
+          
+          {/* Dashboards */}
+          <Route path="/deaf-dashboard" element={<DeafDashboard />} />
           <Route path="/interpreter-dashboard" element={<InterpreterDashboard />} />
-          <Route path="/view-requests" element={<ViewRequestsPage />} />
-        </Routes>
+          
+          {/* ... rest of routes */}
+        </Routes>     
       </div>
     </Router>
   );

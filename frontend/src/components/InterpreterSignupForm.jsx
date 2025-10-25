@@ -45,7 +45,7 @@ function InterpreterSignupForm() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userType', 'interpreter');
         // Redirect to dashboard
-        window.location.href = '/interpreter-dashboard';
+        window.location.href = '/profile-setup/interpreter';
       } else {
         setError(data.message || 'Signup failed');
       }

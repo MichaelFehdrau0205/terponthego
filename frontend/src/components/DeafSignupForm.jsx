@@ -45,7 +45,7 @@ function DeafSignupForm() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userType', 'deaf');
         // Redirect to dashboard (we'll add this later)
-        window.location.href = '/deaf-dashboard';
+        window.location.href = '/profile-setup/deaf';
       } else {
         setError(data.message || 'Signup failed');
       }
