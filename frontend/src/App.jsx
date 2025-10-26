@@ -9,6 +9,7 @@ import TrackingMapView from './components/TrackingMapView';
 import DeafProfileSetup from './components/DeafProfileSetup';
 import InterpreterProfileSetup from './components/InterpreterProfileSetup';
 import DeafDashboard from './components/DeafDashboard';
+import InterpreterDashboard from './components/InterpreterDashboard';
 
 function App() {
   return (
@@ -32,8 +33,10 @@ function App() {
           <Route path="/deaf-dashboard" element={<DeafDashboard />} />
           <Route path="/interpreter-dashboard" element={<InterpreterDashboard />} />
           
+          {/* Map */}
+          <Route path="/map" element={<MapView />} />
           {/* ... rest of routes */}
-        </Routes>     
+        </Routes>  
       </div>
     </Router>
   );
@@ -91,52 +94,6 @@ function HomePage() {
             cursor: 'pointer'
           }}>
             Login
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-
-function InterpreterDashboard() {
-  const userStr = localStorage.getItem('user');
-  const user = userStr ? JSON.parse(userStr) : {};
-  
-  return (
-    <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
-      <h1>👋 Interpreter Dashboard</h1>
-      <h2>Welcome, {user.name}!</h2>
-      
-      <div style={{ marginTop: '40px' }}>
-        <Link to="/view-requests">
-          <button style={{
-            padding: '15px 30px',
-            margin: '10px',
-            fontSize: '16px',
-            backgroundColor: '#f44336',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%'
-          }}>
-            📋 View Available Requests
-          </button>
-        </Link>
-        
-        <Link to="/">
-          <button style={{
-            padding: '10px 20px',
-            marginTop: '20px',
-            backgroundColor: '#999',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}>
-            Logout
           </button>
         </Link>
       </div>
